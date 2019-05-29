@@ -160,7 +160,7 @@ internal final class WebSocketClientUpgradeHandler: ChannelInboundHandler, Remov
         switch response {
         case .head(let head):
             self.state = .awaitingResponseEnd(head)
-        case .body(var buffer):
+        case .body:
             // ignore bodies
             break
         case .end:

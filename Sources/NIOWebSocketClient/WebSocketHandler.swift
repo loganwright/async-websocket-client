@@ -63,12 +63,12 @@ private final class WebSocketHandler: ChannelInboundHandler {
 
         // if this frame was final and we have a non-nil frame sequence,
         // output it to the websocket and clear storage
-        if var frameSequence = self.frameSequence, frame.fin {
+        if let frameSequence = self.frameSequence, frame.fin {
             switch frameSequence.type {
             case .binary:
-                #warning("TODO: pass buffered results")
-            // webSocket.onBinaryCallback(webSocket, frameSequence.binaryBuffer?.readBytes(length: frameSequence.binaryBuffer?.readableBytes ?? 0) ?? [])
-            case .text: webSocket.onTextCallback(webSocket, frameSequence.textBuffer)
+                self.webSocket.onBinaryCallback(self.webSocket, frameSequence.binaryBuffer)
+            case .text:
+                self.webSocket.onTextCallback(self.webSocket, frameSequence.textBuffer)
             default: break
             }
             self.frameSequence = nil
