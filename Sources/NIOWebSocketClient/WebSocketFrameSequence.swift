@@ -1,3 +1,4 @@
+import NIO
 import NIOWebSocket
 
 /// Collects WebSocket frame sequences.
@@ -32,12 +33,12 @@ import NIOWebSocket
 /// any time after opening handshake completion and before that endpoint
 /// has sent a Close frame (Section 5.5.1).
 internal struct WebSocketFrameSequence {
-    var binaryBuffer: ByteBuffer?
+    var binaryBuffer: ByteBuffer
     var textBuffer: String
     var type: WebSocketOpcode
 
     init(type: WebSocketOpcode) {
-        self.binaryBuffer = nil
+        self.binaryBuffer = ByteBufferAllocator().buffer(capacity: 0)
         self.textBuffer = .init()
         self.type = type
     }
@@ -46,13 +47,11 @@ internal struct WebSocketFrameSequence {
         var data = frame.unmaskedData
         switch type {
         case .binary:
-            if var existing = self.binaryBuffer {
-                existing.writeBuffer(&data)
-                self.binaryBuffer = existing
-            } else {
-                self.binaryBuffer = data
+            self.binaryBuffer.writeBuffer(&data)
+        case .text:
+            if let string = data.readString(length: data.readableBytes) {
+                self.textBuffer += string
             }
-        case .text: textBuffer.append(data.readString(length: data.readableBytes) ?? "")
         default: break
         }
     }

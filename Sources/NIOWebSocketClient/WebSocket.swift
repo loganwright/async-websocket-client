@@ -21,7 +21,7 @@ extension WebSocketClient {
         var onTextCallback: (Socket, String) -> ()
 
         /// See `onBinary(...)`.
-        var onBinaryCallback: (Socket, [UInt8]) -> ()
+        var onBinaryCallback: (Socket, ByteBuffer) -> ()
 
         /// See `onError(...)`.
         var onErrorCallback: (Socket, Error) -> ()
@@ -66,7 +66,7 @@ extension WebSocketClient {
         /// - parameters:
         ///     - callback: Closure to accept incoming binary-formatted data.
         ///                 This will be called every time the connected client sends binary-data.
-        public func onBinary(_ callback: @escaping (Socket, [UInt8]) -> ()) {
+        public func onBinary(_ callback: @escaping (Socket, ByteBuffer) -> ()) {
             self.onBinaryCallback = callback
         }
 
