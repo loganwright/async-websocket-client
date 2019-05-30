@@ -91,7 +91,9 @@ public final class WebSocketClient {
                 return channel.pipeline.addHandlers(handlers)
             }
 
-        return bootstrap.connect(host: host, port: port).flatMap { channel in
+        let connect = bootstrap.connect(host: host, port: port)
+        connect.cascadeFailure(to: upgradePromise)
+        return connect.flatMap { channel in
             return upgradePromise.futureResult.flatMap {
                 return channel.closeFuture
             }
