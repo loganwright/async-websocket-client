@@ -15,6 +15,22 @@ final class NIOWebSocketClientTests: XCTestCase {
             }
         }.wait()
     }
+
+    func testBadHost() throws {
+        let client = WebSocketClient(eventLoopGroupProvider: .createNew)
+        defer { try! client.syncShutdown() }
+
+        XCTAssertThrowsError(
+            try client.connect(host: "asdf", port: 80) { webSocket in
+                webSocket.send(text: "Hello")
+                webSocket.onText { webSocket, string in
+                    print(string)
+                    XCTAssertEqual(string, "Hello")
+                    webSocket.close(promise: nil)
+                }
+            }.wait()
+        )
+    }
     
     public func testActivityExample() throws {
         let configuration = WebSocketClient.Configuration(tlsConfiguration: .forClient())

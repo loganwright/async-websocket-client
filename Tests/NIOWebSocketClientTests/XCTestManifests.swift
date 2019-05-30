@@ -6,6 +6,8 @@ extension NIOWebSocketClientTests {
     //   `swift test --generate-linuxmain`
     // to regenerate.
     static let __allTests__NIOWebSocketClientTests = [
+        ("testActivityExample", testActivityExample),
+        ("testBadHost", testBadHost),
         ("testExample", testExample),
     ]
 }

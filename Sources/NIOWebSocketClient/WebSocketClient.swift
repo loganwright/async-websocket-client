@@ -60,17 +60,18 @@ public final class WebSocketClient {
         headers: HTTPHeaders = [:],
         onUpgrade: @escaping (Socket) -> ()
     ) -> EventLoopFuture<Void> {
-        let upgradePromise = self.group.next().makePromise(of: Void.self)
+        var upgradePromise: EventLoopPromise<Void>? = nil
         let bootstrap = ClientBootstrap(group: self.group)
             .channelOption(ChannelOptions.socket(SocketOptionLevel(IPPROTO_TCP), TCP_NODELAY), value: 1)
             .channelInitializer { channel in
+                upgradePromise = channel.eventLoop.makePromise(of: Void.self)
                 let httpEncoder = HTTPRequestEncoder()
                 let httpDecoder = ByteToMessageHandler(HTTPResponseDecoder(leftOverBytesStrategy: .forwardBytes))
                 let webSocketUpgrader = WebSocketClientUpgradeHandler(
                     configuration: self.configuration,
                     host: host,
                     uri: uri,
-                    upgradePromise: upgradePromise
+                    upgradePromise: upgradePromise!
                 ) { channel, response in
                     let webSocket = Socket(channel: channel)
                     return channel.pipeline.removeHandler(httpEncoder).flatMap {
@@ -92,7 +93,7 @@ public final class WebSocketClient {
             }
 
         return bootstrap.connect(host: host, port: port).flatMap { channel in
-            return upgradePromise.futureResult.flatMap {
+            return upgradePromise!.futureResult.flatMap {
                 return channel.closeFuture
             }
         }
