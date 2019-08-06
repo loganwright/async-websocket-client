@@ -1,7 +1,7 @@
 import XCTest
-@testable import NIOWebSocketClient
+@testable import AsyncWebSocketClient
 
-final class NIOWebSocketClientTests: XCTestCase {
+final class AsyncWebSocketClientTests: XCTestCase {
     func testExample() throws {
         let client = WebSocketClient(eventLoopGroupProvider: .createNew)
         defer { try! client.syncShutdown() }
